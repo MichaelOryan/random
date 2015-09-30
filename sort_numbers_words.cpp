@@ -50,6 +50,7 @@ std::string typeSort(std::string input_string)
 	// ie; first sorted number to first unsorted number position,etc
 	auto it_numbers = partitioned.begin();
 	auto it_words = partition;
+
 	for(std::string &s : values)
 	{
 		if(isNumber(s))

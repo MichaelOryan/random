@@ -31,7 +31,7 @@ int main(int argc, char** argv)
 std::string typeSort(std::string input_string)
 {
 	// Turn our input into a vector of strings
-    std::vector<std::string> values;
+	std::vector<std::string> values;
 
 	split(values, input_string, boost::is_any_of(" "));
 

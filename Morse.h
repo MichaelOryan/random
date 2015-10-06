@@ -12,7 +12,6 @@ vector<string> mycode = {"-", "-", "-"};
 cout << "decode: " << ":" << morse_coder.decode(mycode) << ":";
 
 */
-
 #ifndef MORSE_H
 #define MORSE_H
 
@@ -24,7 +23,10 @@ template<class T>
 class Morse{
 
 	private:
-	typedef std::vector< T* > code_vector;
+
+	enum Symbol {DOT, DASH, SPACE};
+
+	typedef std::vector< Symbol > code_vector;
 	typedef boost::bimap< char, code_vector > codex_bimap;
 	typedef typename codex_bimap::value_type match;
 	typedef boost::bimap< std::string, int > results_bimap;
@@ -34,33 +36,32 @@ class Morse{
 	T dash;
 	T space;
 
-
-	code_vector MORSE_A = {&dot, &dash};
-	code_vector MORSE_B = {&dash, &dot, &dot, &dot};
-	code_vector MORSE_C = {&dash, &dot, &dash, &dot};
-	code_vector MORSE_D = {&dash, &dot, &dot};
-	code_vector MORSE_E = {&dot};
-	code_vector MORSE_F = {&dot, &dot, &dash, &dot};
-	code_vector MORSE_G = {&dash, &dash, &dot};
-    code_vector MORSE_Ha = {&dot, &dot, &dot, &dot}; //Codeblocks is having some issue with this being MORSE_H
-	code_vector MORSE_I = {&dot, &dot};
-	code_vector MORSE_J = {&dot, &dash, &dash, &dash};
-	code_vector MORSE_K = {&dash, &dot, &dash};
-	code_vector MORSE_L = {&dot, &dash, &dot, &dot};
-	code_vector MORSE_M = {&dash, &dash};
-	code_vector MORSE_N = {&dash, &dot};
-	code_vector MORSE_O = {&dash, &dash, &dash};
-	code_vector MORSE_P = {&dot, &dash, &dash, &dot};
-	code_vector MORSE_Q = {&dash, &dash, &dot, &dash};
-	code_vector MORSE_R = {&dot, &dash, &dot};
-	code_vector MORSE_S = {&dot, &dot, &dot};
-	code_vector MORSE_T = {&dash};
-	code_vector MORSE_U = {&dot, &dot, &dash};
-	code_vector MORSE_V = {&dot, &dot, &dot, &dash};
-	code_vector MORSE_W = {&dot, &dash, &dash};
-	code_vector MORSE_X = {&dash, &dot, &dot, &dash};
-	code_vector MORSE_Y = {&dash, &dot, &dash, &dash};
-	code_vector MORSE_Z = {&dash, &dash, &dot, &dot};
+	code_vector MORSE_A = {DOT, DASH};
+	code_vector MORSE_B = {DASH, DOT, DOT, DOT};
+	code_vector MORSE_C = {DASH, DOT, DASH, DOT};
+	code_vector MORSE_D = {DASH, DOT, DOT};
+	code_vector MORSE_E = {DOT};
+	code_vector MORSE_F = {DOT, DOT, DASH, DOT};
+	code_vector MORSE_G = {DASH, DASH, DOT};
+	code_vector MORSE_Ha = {DOT, DOT, DOT, DOT}; //Codeblocks is having some issue with this being MORSE_H
+	code_vector MORSE_I = {DOT, DOT};
+	code_vector MORSE_J = {DOT, DASH, DASH, DASH};
+	code_vector MORSE_K = {DASH, DOT, DASH};
+	code_vector MORSE_L = {DOT, DASH, DOT, DOT};
+	code_vector MORSE_M = {DASH, DASH};
+	code_vector MORSE_N = {DASH, DOT};
+	code_vector MORSE_O = {DASH, DASH, DASH};
+	code_vector MORSE_P = {DOT, DASH, DASH, DOT};
+	code_vector MORSE_Q = {DASH, DASH, DOT, DASH};
+	code_vector MORSE_R = {DOT, DASH, DOT};
+	code_vector MORSE_S = {DOT, DOT, DOT};
+	code_vector MORSE_T = {DASH};
+	code_vector MORSE_U = {DOT, DOT, DASH};
+	code_vector MORSE_V = {DOT, DOT, DOT, DASH};
+	code_vector MORSE_W = {DOT, DASH, DASH};
+	code_vector MORSE_X = {DASH, DOT, DOT, DASH};
+	code_vector MORSE_Y = {DASH, DOT, DASH, DASH};
+	code_vector MORSE_Z = {DASH, DASH, DOT, DOT};
 
 	const char LETTER_A = 'a';
 	const char LETTER_B = 'b';
@@ -88,7 +89,6 @@ class Morse{
 	const char LETTER_X = 'x';
 	const char LETTER_Y = 'y';
 	const char LETTER_Z = 'z';
-
 
 	codex_bimap codex;
 	void init_codex(){
@@ -131,16 +131,23 @@ class Morse{
 
 	std::vector<T> encode(std::string s)
 	{
-        for(char &c : s)
-            c = std::tolower(c);
+        std::string lower_s;
+        for(char c: s)
+        {
+            lower_s += std::tolower(c);
+        }
+
 		std::vector<T> code;
-		for(char &c : s)
+
+		for(char c : lower_s)
 		{
             if(this->codex.left.find(c) != this->codex.left.end())
             {
                 code_vector letterCode = this->codex.left.at(c);
-                for(T* ptr_t : letterCode)
-                    code.push_back(*ptr_t);
+                for(Symbol sy : letterCode)
+                {
+                    code.push_back(symbolToType(sy));
+                }
                 code.push_back(space);
             }
 
@@ -152,31 +159,53 @@ class Morse{
     char decode(std::vector<T> code)
     {
 
-        std::vector<T*> ptr_code;
-
-        for(T t : code)
-            ptr_code.push_back(covertToPointer(t));
-
         char letter = ' ';
 
-        if(this->codex.right.find(ptr_code) != this->codex.right.end())
-            letter = this->codex.right.at(ptr_code);
+        code_vector lookUpCode;
+        for(T t : code)
+        {
+            lookUpCode.push_back(typeToSymbol(t));
+        }
+
+        if(this->codex.right.find(lookUpCode) != this->codex.right.end())
+        {
+            letter = this->codex.right.at(lookUpCode);
+        }
 
         return letter;
     }
 
-    T* covertToPointer(T t)
+
+    T symbolToType(Symbol symbol)
     {
-        T* ptr_t;
+
+        if(symbol == DOT)
+        {
+            return this->dot;
+        }
+        else if(symbol == DASH)
+        {
+            return this->dash;
+        }
+
+        return this->space;
+
+    }
+
+    Symbol typeToSymbol(T t)
+    {
 
         if(t == dot)
-            ptr_t = &dot;
-        else if (t == dash)
-            ptr_t = &dash;
-        else
-            ptr_t = &space;
+        {
+            return DOT;
+        }
+        else if(t == dash)
+        {
+            return DASH;
+        }
 
-        return ptr_t;
+        return SPACE;
+
     }
 
 };

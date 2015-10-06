@@ -1,3 +1,18 @@
+/*
+Example usage
+
+Morse<std::string>morse_coder(".", "-", " ");
+vector<string> v_code = morse_coder.encode("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+
+std::string code = boost::join(v_code, "");
+cout << code << endl;
+
+vector<string> mycode = {"-", "-", "-"};
+
+cout << "decode: " << ":" << morse_coder.decode(mycode) << ":";
+
+*/
+
 #ifndef MORSE_H
 #define MORSE_H
 

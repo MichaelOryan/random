@@ -12,11 +12,12 @@ vector<string> mycode = {"-", "-", "-"};
 cout << "decode: " << ":" << morse_coder.decode(mycode) << ":";
 
 */
-#ifndef MORSE_H
-#define MORSE_H
+#ifndef _MORSE_H
+#define _MORSE_H
 
 #include <vector>
 #include <boost/bimap.hpp>
+#include <boost/algorithm/string.hpp>
 
 
 template<class T>
@@ -43,7 +44,7 @@ class Morse{
 	code_vector MORSE_E = {DOT};
 	code_vector MORSE_F = {DOT, DOT, DASH, DOT};
 	code_vector MORSE_G = {DASH, DASH, DOT};
-	code_vector MORSE_Ha = {DOT, DOT, DOT, DOT}; //Codeblocks is having some issue with this being MORSE_H
+	code_vector MORSE_H = {DOT, DOT, DOT, DOT};
 	code_vector MORSE_I = {DOT, DOT};
 	code_vector MORSE_J = {DOT, DASH, DASH, DASH};
 	code_vector MORSE_K = {DASH, DOT, DASH};
@@ -99,7 +100,7 @@ class Morse{
 		codex.insert(match(LETTER_E, MORSE_E));
 		codex.insert(match(LETTER_F, MORSE_F));
 		codex.insert(match(LETTER_G, MORSE_G));
-		codex.insert(match(LETTER_H, MORSE_Ha));
+		codex.insert(match(LETTER_H, MORSE_H));
 		codex.insert(match(LETTER_I, MORSE_I));
 		codex.insert(match(LETTER_J, MORSE_J));
 		codex.insert(match(LETTER_K, MORSE_K));
@@ -131,12 +132,7 @@ class Morse{
 
 	std::vector<T> encode(std::string s)
 	{
-        std::string lower_s;
-        for(char c: s)
-        {
-            lower_s += std::tolower(c);
-        }
-
+        std::string lower_s = boost::to_lower_copy(s);
 		std::vector<T> code;
 
 		for(char c : lower_s)
@@ -211,4 +207,4 @@ class Morse{
 };
 
 
-#endif // MORSE_H
+#endif //_MORSE_H

@@ -1,13 +1,14 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
-#include <climits>
+#include <limits>
 
 void promptUserForNumber(std::ostream & out = std::cout) {
     out << "Enter a number to double: ";
 }
 
-void outputDoubleNumber(int number, std::ostream & out = std::cout) {
+template<class T>
+void outputDoubleNumber(T number, std::ostream & out = std::cout) {
     out << "Double your number is " << number << std::endl;
 }
 
@@ -16,16 +17,19 @@ void removeLine(std::istream & in = std::cin) {
     getline(in, bad_chars);
 }
 
-void promptValidIntegerRange(int min, int max, std::ostream & out = std::cout) {
-    out << "Please enter an integer between " << min << " and " << max << ": ";;
+template<class T>
+void promptValidNumberRange(T min, T max, std::ostream & out = std::cout) {
+    out << "Please enter a number between " << min << " and " << max << ": ";;
 }
 
-bool inRange(int n, int min, int max) {
-    return n >= min && n <= max;
+template<class T>
+bool inRange(T number, T min, T max) {
+    return number >= min && number <= max;
 }
 
-int readInt(int min, int max, std::istream & in = std::cin) {
-    int number;
+template<class T>
+T readInt(T min, T max, std::istream & in = std::cin) {
+    T number;
     
     in >> number;
     bool readIntSucceeded = in.good();
@@ -35,7 +39,7 @@ int readInt(int min, int max, std::istream & in = std::cin) {
         
         removeLine(in);
         
-        promptValidIntegerRange(min, max);
+        promptValidNumberRange(min, max);
 
         in >> number;
         readIntSucceeded = in.good();
@@ -44,15 +48,23 @@ int readInt(int min, int max, std::istream & in = std::cin) {
     return number;
 }
 
-bool doubleOverflow(int number) {
-    return number > INT_MAX / 2;
+template<class T>
+T halveNumber(T number) {
+    return number / 2;
 }
 
-bool doubleUnderflow(int number) {
-    return number < INT_MIN / 2;
+template<class T>
+bool doubleOverflow(T number) {
+    return number > halveNumber(std::numeric_limits<T>::max());
 }
 
-int doubleNumber(int number) {
+template<class T>
+bool doubleUnderflow(T number) {
+    return number < halveNumber(std::numeric_limits<T>::min());
+}
+
+template<class T>
+T doubleNumber(T number) {
   
     if(doubleOverflow(number)) {
         throw std::overflow_error("Overflow error!");
@@ -61,25 +73,22 @@ int doubleNumber(int number) {
         throw std::underflow_error("Underflow error!");
     }
     
-    int double_number = number * 2;
+    T double_number = number * 2;
     
     return double_number;
 }
 
-int halveNumber(int number) {
-    return number / 2;
-}
-
+template<class T>
 void readAndDoubleNumber(std::istream & in = std::cin, std::ostream & out = std::cout) {
     try {
     
         promptUserForNumber(out);
         
-        int minimum_number = halveNumber(INT_MIN);
-        int maximum_number = halveNumber(INT_MAX);
+        T minimum_number = halveNumber(std::numeric_limits<T>::min());
+        T maximum_number = halveNumber(std::numeric_limits<T>::max());
         
-        int number = readInt(minimum_number, maximum_number, in);
-        int double_number = doubleNumber(number);
+        T number = readInt(minimum_number, maximum_number, in);
+        T double_number = doubleNumber(number);
         
         outputDoubleNumber(double_number, out);
     }
@@ -96,7 +105,7 @@ void readAndDoubleNumber(std::istream & in = std::cin, std::ostream & out = std:
 }
 
 int main() {
-    readAndDoubleNumber(std::cin, std::cout);
+    readAndDoubleNumber<long long int>(std::cin, std::cout);
     
     return 0;
 }

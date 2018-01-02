@@ -13,8 +13,8 @@ void outputDoubleNumber(T number, std::ostream & out = std::cout) {
 }
 
 void removeLine(std::istream & in = std::cin) {
-    std::string bad_chars;
-    getline(in, bad_chars);
+    std::string ignored_chars;
+    getline(in, ignored_chars);
 }
 
 template<class T>
@@ -28,13 +28,13 @@ bool inRange(T number, T min, T max) {
 }
 
 template<class T>
-T readInt(T min, T max, std::istream & in = std::cin) {
+T readInt(T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max(), std::istream & in = std::cin) {
     T number;
     
-    in >> number;
-    bool readIntSucceeded = in.good();
     
-    while(!readIntSucceeded || !inRange(number, min, max)) {
+    bool readNumberSucceeded = in >> number;
+    
+    while(!readNumberSucceeded || !inRange(number, min, max)) {
         in.clear();
         
         removeLine(in);
@@ -42,7 +42,7 @@ T readInt(T min, T max, std::istream & in = std::cin) {
         promptValidNumberRange(min, max);
 
         in >> number;
-        readIntSucceeded = in.good();
+        readNumberSucceeded = in >> number;
     }
     
     return number;
@@ -54,22 +54,22 @@ T halveNumber(T number) {
 }
 
 template<class T>
-bool doubleOverflow(T number) {
+bool doublingWillOverflow(T number) {
     return number > halveNumber(std::numeric_limits<T>::max());
 }
 
 template<class T>
-bool doubleUnderflow(T number) {
+bool doublingWillUnderflow(T number) {
     return number < halveNumber(std::numeric_limits<T>::min());
 }
 
 template<class T>
 T doubleNumber(T number) {
   
-    if(doubleOverflow(number)) {
+    if(doublingWillOverflow(number)) {
         throw std::overflow_error("Overflow error!");
     } 
-    else if(doubleUnderflow(number)) {
+    else if(doublingWillUnderflow(number)) {
         throw std::underflow_error("Underflow error!");
     }
     

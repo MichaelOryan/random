@@ -14,7 +14,6 @@ void outputNumber(int number) {
 void removeLine() {
     std::string bad_chars;
     getline(std::cin, bad_chars);
-
 }
 
 void promptValidIntegerRange() {
@@ -28,6 +27,7 @@ int readInt() {
     
     while(!readIntSucceeded) {
         std::cin.clear();
+        
         removeLine();
         
         promptValidIntegerRange();
@@ -38,7 +38,6 @@ int readInt() {
     return number;
 }
 
-
 bool doubleOverflow(int number, int double_number) {
     return number > 0 && double_number < number;
 }
@@ -47,21 +46,19 @@ bool doubleUnderflow(int number, int double_number) {
     return number < 0 && double_number > number;
 }
 
-
 int doubleNumber(int number) {
     int double_number = number * 2;
     
     if(doubleOverflow(number, double_number)) {
-        throw std::overflow_error("");
+        throw std::overflow_error("Overflow error!");
     } 
     else if(doubleUnderflow(number, double_number)) {
-        throw std::underflow_error("");
+        throw std::underflow_error("Underflow error!");
     }
     return double_number;
 }
 
-int main()
-{
+int main() {
     try {
         promptUserForNumber();
         
@@ -70,14 +67,14 @@ int main()
         
         outputNumber(double_number);
     }
-    catch(std::overflow_error e) {
-        std::cout << "Overflow error!" << std::endl;
+    catch(std::runtime_error e) {
+        std::cout << e.what() << std::endl;
     }
-    catch(std::underflow_error e) {
-        std::cout << "Underflow error!" << std::endl;
+    catch(std::exception e) {
+        std::cout << e.what() << std::endl;
     }
     catch(...) {
-        std::cout << "Invalid number" << std::endl;
+        std::cout << "Unknown Error" << std::endl;
     }
     
     return 0;

@@ -31,7 +31,6 @@ template<class T>
 T readInt(T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max(), std::istream & in = std::cin) {
     T number;
     
-    
     bool readNumberSucceeded = in >> number;
     
     while(!readNumberSucceeded || !inRange(number, min, max)) {

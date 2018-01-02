@@ -70,7 +70,7 @@ int halveNumber(int number) {
     return number / 2;
 }
 
-void readAndDoubleNumber(std::istream & in, std::ostream & out) {
+void readAndDoubleNumber(std::istream & in = std::cin, std::ostream & out = std::cout) {
     try {
     
         promptUserForNumber(out);

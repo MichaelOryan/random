@@ -11,18 +11,26 @@ void outputNumber(int number) {
     std::cout << "Double your number is " << number << std::endl;
 }
 
+void removeLine() {
+    std::string bad_chars;
+    getline(std::cin, bad_chars);
+
+}
+
+void promptValidIntegerRange() {
+    std::cout << "Please enter an integer between " << INT_MIN << " and " << INT_MAX << ": ";;
+}
+
 int readInt() {
     int number;
     
     bool readIntSucceeded = (std::cin >> number);
     
     while(!readIntSucceeded) {
-        std::string bad_chars;
-        
         std::cin.clear();
-        getline(std::cin, bad_chars);
+        removeLine();
         
-        std::cout << "Please enter an integer between " << INT_MIN << " and " << INT_MAX << ": ";;
+        promptValidIntegerRange();
         
         readIntSucceeded = (std::cin >> number);
     }

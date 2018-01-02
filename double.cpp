@@ -3,79 +3,100 @@
 #include <string>
 #include <climits>
 
-void promptUserForNumber() {
-    std::cout << "Enter a number to double: ";
+void promptUserForNumber(std::ostream & out = std::cout) {
+    out << "Enter a number to double: ";
 }
 
-void outputNumber(int number) {
-    std::cout << "Double your number is " << number << std::endl;
+void outputDoubleNumber(int number, std::ostream & out = std::cout) {
+    out << "Double your number is " << number << std::endl;
 }
 
-void removeLine() {
+void removeLine(std::istream & in = std::cin) {
     std::string bad_chars;
-    getline(std::cin, bad_chars);
+    getline(in, bad_chars);
 }
 
-void promptValidIntegerRange() {
-    std::cout << "Please enter an integer between " << INT_MIN << " and " << INT_MAX << ": ";;
+void promptValidIntegerRange(int min, int max, std::ostream & out = std::cout) {
+    out << "Please enter an integer between " << min << " and " << max << ": ";;
 }
 
-int readInt() {
+bool inRange(int n, int min, int max) {
+    return n >= min && n <= max;
+}
+
+int readInt(int min, int max, std::istream & in = std::cin) {
     int number;
     
-    bool readIntSucceeded = (std::cin >> number);
+    in >> number;
+    bool readIntSucceeded = in.good();
     
-    while(!readIntSucceeded) {
-        std::cin.clear();
+    while(!readIntSucceeded || !inRange(number, min, max)) {
+        in.clear();
         
-        removeLine();
+        removeLine(in);
         
-        promptValidIntegerRange();
-        
-        readIntSucceeded = (std::cin >> number);
+        promptValidIntegerRange(min, max);
+
+        in >> number;
+        readIntSucceeded = in.good();
     }
     
     return number;
 }
 
-bool doubleOverflow(int number, int double_number) {
-    return number > 0 && double_number < number;
+bool doubleOverflow(int number) {
+    return number > INT_MAX / 2;
 }
 
-bool doubleUnderflow(int number, int double_number) {
-    return number < 0 && double_number > number;
+bool doubleUnderflow(int number) {
+    return number < INT_MIN / 2;
 }
 
 int doubleNumber(int number) {
-    int double_number = number * 2;
-    
-    if(doubleOverflow(number, double_number)) {
+  
+    if(doubleOverflow(number)) {
         throw std::overflow_error("Overflow error!");
     } 
-    else if(doubleUnderflow(number, double_number)) {
+    else if(doubleUnderflow(number)) {
         throw std::underflow_error("Underflow error!");
     }
+    
+    int double_number = number * 2;
+    
     return double_number;
 }
 
-int main() {
+int halveNumber(int number) {
+    return number / 2;
+}
+
+void readAndDoubleNumber(std::istream & in, std::ostream & out) {
     try {
-        promptUserForNumber();
+    
+        promptUserForNumber(out);
         
-        int number = readInt();
+        int minimum_number = halveNumber(INT_MIN);
+        int maximum_number = halveNumber(INT_MAX);
+        
+        int number = readInt(minimum_number, maximum_number, in);
         int double_number = doubleNumber(number);
         
-        outputNumber(double_number);
+        outputDoubleNumber(double_number, out);
     }
     catch(std::runtime_error e) {
-        std::cout << e.what() << std::endl;
+        std::cerr << e.what() << std::endl;
     }
     catch(std::exception e) {
-        std::cout << e.what() << std::endl;
+        std::cerr << e.what() << std::endl;
     }
     catch(...) {
-        std::cout << "Unknown Error" << std::endl;
+        std::cerr << "Unknown Error" << std::endl;
     }
+    
+}
+
+int main() {
+    readAndDoubleNumber(std::cin, std::cout);
     
     return 0;
 }

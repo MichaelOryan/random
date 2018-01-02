@@ -31,7 +31,6 @@ template<class T>
 T readInt(T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max(), std::istream & in = std::cin) {
     T number;
     
-    
     bool readNumberSucceeded = in >> number;
     
     while(!readNumberSucceeded || !inRange(number, min, max)) {
@@ -65,7 +64,7 @@ bool doublingWillUnderflow(T number) {
 
 template<class T>
 T doubleNumber(T number) {
-  
+    
     if(doublingWillOverflow(number)) {
         throw std::overflow_error("Overflow error!");
     } 
@@ -81,7 +80,6 @@ T doubleNumber(T number) {
 template<class T>
 void readAndDoubleNumber(std::istream & in = std::cin, std::ostream & out = std::cout) {
     try {
-    
         promptUserForNumber(out);
         
         T minimum_number = halveNumber(std::numeric_limits<T>::min());

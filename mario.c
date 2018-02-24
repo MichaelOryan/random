@@ -15,7 +15,7 @@
 struct Pyramid;
 
 int calc_pyramid_height(int left_height, int right_height);
-int calc_pyramid_width(struct Pyramid pyramid);
+int calc_pyramid_width(struct Pyramid *pyramid);
 struct Pyramid construct_pyramid_specs(int left_height, int right_height);
 int get_int(char * prompt);
 bool is_invalid_height(int pyramid_height);
@@ -35,7 +35,8 @@ int calc_pyramid_side_size(int pyramid_height, int current_level, int offset);
 void print_new_line();
 void print_level_above(struct Pyramid *pyramid, int current_level);
 void print_level(struct Pyramid *pyramid, int current_level);
-void print_pyramid(struct Pyramid pyramid);
+void print_pyramid(struct Pyramid *pyramid);
+void print_pyramid_concurrent(struct Pyramid pyramid);
 int calc_pyramid_left_size(struct Pyramid *pyramid, int current_level);
 int calc_pyramid_right_size(struct Pyramid *pyramid, int current_level);
 int get_left_height();
@@ -56,9 +57,9 @@ int calc_pyramid_height(int left_height, int right_height)
     return max(left_height, right_height);
 }
 
-int calc_pyramid_width(struct Pyramid pyramid)
+int calc_pyramid_width(struct Pyramid *pyramid)
 {
-    return pyramid.left_height + pyramid.gap + pyramid.right_height;
+    return pyramid->left_height + pyramid->gap + pyramid->right_height;
 }
 
 struct Pyramid construct_pyramid_specs(int left_height, int right_height)
@@ -68,7 +69,7 @@ struct Pyramid construct_pyramid_specs(int left_height, int right_height)
     pyramid.right_height = right_height;
     pyramid.height = calc_pyramid_height(left_height, right_height);
     pyramid.gap = PYRAMID_GAP_SIZE;
-    pyramid.width = calc_pyramid_width(pyramid);
+    pyramid.width = calc_pyramid_width(&pyramid);
     return pyramid;
 }
 
@@ -78,7 +79,8 @@ int main(void)
     int left_height = get_left_height();
     int right_height = get_right_height();
     struct Pyramid pyramid = construct_pyramid_specs(left_height, right_height);
-    print_pyramid(pyramid);
+    print_pyramid(&pyramid);
+    print_pyramid_concurrent(pyramid);
 }
 
 int get_int(char * prompt)
@@ -193,6 +195,7 @@ int calc_pyramid_side_size(int pyramid_height, int current_level, int offset)
     // that makes more sense
     int side_size = PYRAMID_STARTING_LEVEL; // Need clearer logic
     side_size += pyramid_height - current_level + offset;
+    
     if(side_size < 0)
     {
         side_size = 0;
@@ -201,6 +204,7 @@ int calc_pyramid_side_size(int pyramid_height, int current_level, int offset)
     {
         side_size = pyramid_height;
     }
+    
     return side_size;
 }
 
@@ -222,6 +226,7 @@ void print_level_above(struct Pyramid *pyramid, int current_level)
 void print_level(struct Pyramid *pyramid, int current_level)
 {
     print_level_above(pyramid, current_level);
+    
     int left_side_size = calc_pyramid_left_size(pyramid, current_level);
     int right_side_size = calc_pyramid_right_size(pyramid, current_level);
     
@@ -248,12 +253,17 @@ int max(int a, int b)
     return maximum;
 }
 
-void print_pyramid(struct Pyramid pyramid)
+void print_pyramid(struct Pyramid *pyramid)
+{
+    int current_level = PYRAMID_STARTING_LEVEL;
+    print_level(pyramid, current_level);
+}
+
+void print_pyramid_concurrent(struct Pyramid pyramid)
 {
     int current_level = PYRAMID_STARTING_LEVEL;
     print_level(&pyramid, current_level);
 }
-
 
 int calc_pyramid_left_size(struct Pyramid *pyramid, int current_level)
 {

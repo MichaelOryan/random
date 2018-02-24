@@ -23,16 +23,16 @@ void print_character(char c);
 int calc_level_above(int current_level);
 int get_pyramid_height();
 int calc_air_blocks(int pyramid_height, int pyramid_side_size);
-void repeat_print(char c, int amount);
-void print_air_blocks(int pyramid_height, int pyramid_side_size);
-void print_left_air(struct Pyramid *pyramid, int pyramid_side_size);
-void print_right_air(struct Pyramid *pyramid, int pyramid_side_size);
-void print_pyramid_side(int pyramid_side_size);
-void print_left_pyramid_side(int pyramid_side_size);
-void print_right_pyramid_side(int pyramid_side_size);
-void print_gap(int gap_size);
+void repeat_print(char c, int amount, void (*print_char)(char));
+void print_air_blocks(int pyramid_height, int pyramid_side_size, void (*print_char)(char));
+void print_left_air(struct Pyramid *pyramid, int pyramid_side_size, void (*print_char)(char));
+void print_right_air(struct Pyramid *pyramid, int pyramid_side_size, void (*print_char)(char));
+void print_pyramid_side(int pyramid_side_size, void (*print_char)(char));
+void print_left_pyramid_side(int pyramid_side_size, void (*print_char)(char));
+void print_right_pyramid_side(int pyramid_side_size, void (*print_char)(char));
+void print_gap(int gap_size, void (*print_char)(char));
 int calc_pyramid_side_size(int pyramid_height, int current_level, int offset);
-void print_new_line();
+void print_new_line(void (*print_char)(char));
 void print_level_above(struct Pyramid *pyramid, int current_level);
 void print_level(struct Pyramid *pyramid, int current_level);
 void print_pyramid(struct Pyramid *pyramid);
@@ -50,6 +50,7 @@ struct Pyramid {
     int gap;
     int left_height;
     int right_height;
+    void (*print_character)(char);
 };
 
 int calc_pyramid_height(int left_height, int right_height)
@@ -70,7 +71,13 @@ struct Pyramid construct_pyramid_specs(int left_height, int right_height)
     pyramid.height = calc_pyramid_height(left_height, right_height);
     pyramid.gap = PYRAMID_GAP_SIZE;
     pyramid.width = calc_pyramid_width(&pyramid);
+    pyramid.print_character = print_character;
     return pyramid;
+}
+
+void print_prefix(char c)
+{
+    printf("_%c", c);
 }
 
 int main(void)
@@ -80,6 +87,7 @@ int main(void)
     int right_height = get_right_height();
     struct Pyramid pyramid = construct_pyramid_specs(left_height, right_height);
     print_pyramid(&pyramid);
+    pyramid.print_character = print_prefix;
     print_pyramid_concurrent(pyramid);
 }
 
@@ -142,50 +150,50 @@ int calc_air_blocks(int pyramid_height, int pyramid_side_size)
     return pyramid_height - pyramid_side_size;
 }
 
-void repeat_print(char c, int amount)
+void repeat_print(char c, int amount, void (*print_char)(char))
 {
     for(int count = 0; count < amount; count++)
     {
-        print_character(c);
+        print_char(c);
     }
 }
 
-void print_air_blocks(int pyramid_height, int side_size)
+void print_air_blocks(int pyramid_height, int side_size, void (*print_char)(char))
 {
     int number_of_air_blocks = calc_air_blocks(pyramid_height, side_size);
     
-    repeat_print(AIR_BLOCK, number_of_air_blocks);
+    repeat_print(AIR_BLOCK, number_of_air_blocks, print_char);
 
 }
 
-void print_left_air(struct Pyramid *pyramid, int pyramid_side_size)
+void print_left_air(struct Pyramid *pyramid, int pyramid_side_size, void (*print_char)(char))
 {
-    print_air_blocks(pyramid->left_height, pyramid_side_size);
+    print_air_blocks(pyramid->left_height, pyramid_side_size, print_char);
 }
 
-void print_right_air(struct Pyramid *pyramid, int pyramid_side_size)
+void print_right_air(struct Pyramid *pyramid, int pyramid_side_size, void (*print_char)(char))
 {
-    print_air_blocks(pyramid->right_height, pyramid_side_size);
+    print_air_blocks(pyramid->right_height, pyramid_side_size, print_char);
 }
 
-void print_pyramid_side(int pyramid_side_size)
+void print_pyramid_side(int pyramid_side_size, void (*print_char)(char))
 {
-    repeat_print(BRICK_BLOCK, pyramid_side_size);
+    repeat_print(BRICK_BLOCK, pyramid_side_size, print_char);
 }
 
-void print_left_pyramid_side(int pyramid_side_size)
+void print_left_pyramid_side(int pyramid_side_size, void (*print_char)(char))
 {
-    print_pyramid_side(pyramid_side_size);
+    print_pyramid_side(pyramid_side_size, print_char);
 }
 
-void print_right_pyramid_side(int pyramid_side_size)
+void print_right_pyramid_side(int pyramid_side_size, void (*print_char)(char))
 {
-    print_pyramid_side(pyramid_side_size);
+    print_pyramid_side(pyramid_side_size, print_char);
 }
 
-void print_gap(int gap_size)
+void print_gap(int gap_size, void (*print_char)(char))
 {
-    repeat_print(AIR_BLOCK, gap_size);
+    repeat_print(AIR_BLOCK, gap_size, print_char);
 }
 
 int calc_pyramid_side_size(int pyramid_height, int current_level, int offset)
@@ -208,9 +216,9 @@ int calc_pyramid_side_size(int pyramid_height, int current_level, int offset)
     return side_size;
 }
 
-void print_new_line()
+void print_new_line(void (*print_char)(char))
 {
-    print_character(NEWLINE_CHARACTER);
+    print_char(NEWLINE_CHARACTER);
 }
 
 void print_level_above(struct Pyramid *pyramid, int current_level)
@@ -229,16 +237,17 @@ void print_level(struct Pyramid *pyramid, int current_level)
     
     int left_side_size = calc_pyramid_left_size(pyramid, current_level);
     int right_side_size = calc_pyramid_right_size(pyramid, current_level);
+    void (*print_char)(char) = pyramid->print_character;
     
-    print_left_air(pyramid, left_side_size);
-    print_left_pyramid_side(left_side_size);
+    print_left_air(pyramid, left_side_size, print_char);
+    print_left_pyramid_side(left_side_size, print_char);
     
-    print_gap(PYRAMID_GAP_SIZE);
+    print_gap(PYRAMID_GAP_SIZE, print_char);
     
-    print_right_pyramid_side(right_side_size);
-    print_right_air(pyramid, right_side_size);
+    print_right_pyramid_side(right_side_size, print_char);
+    print_right_air(pyramid, right_side_size, print_char);
     
-    print_new_line();
+    print_new_line(print_char);
 }
 
 int max(int a, int b)
